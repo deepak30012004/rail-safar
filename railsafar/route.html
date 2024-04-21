@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Railway Train Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            background-color: #8EC5FC;
+background-image: linear-gradient(62deg, #8EC5FC 0%, #E0C3FC 100%);}
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #0093E9;
+background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            margin: 0 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button[type="submit"] {
+            padding: 8px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Indian Railway Train Status</h1>
+        <form id="trainForm">
+            <label for="trainNumber">Enter Train Number:</label>
+            <input type="text" id="trainNumber" name="trainNumber" required>
+            <button type="submit">Get Status</button>
+        </form>
+
+        <div id="statusContainer">
+            <!-- Status will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("trainForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+
+            // Get the train number entered by the user
+            const trainNumber = document.getElementById("trainNumber").value;
+
+            // Make a request to fetch train status
+            fetchTrainStatus(trainNumber);
+        });
+
+        function fetchTrainStatus(trainNumber) {
+            // API endpoint
+            const endpoint = `https://indian-railway-irctc.p.rapidapi.com/getTrainId?trainno=${trainNumber}`;
+
+            // Request headers
+            const headers = {
+                'x-rapid-api': 'rapid-api-database',
+                'X-RapidAPI-Key': 'c0963bd6e4msh4cf8b246c9b4365p1b520cjsnc1c21d9e2839',
+                'X-RapidAPI-Host': 'indian-railway-irctc.p.rapidapi.com'
+            };
+
+            // Make a request
+            fetch(endpoint, {
+                headers: headers
+            })
+            .then(response => response.json())
+            .then(data => {
+                const trainId = data[0].id;
+
+                // Now get train status by ID
+                return fetch(`https://indian-railway-irctc.p.rapidapi.com/getTrainLiveStatusById?id=${trainId}&date=16april`, {
+                    headers: headers
+                });
+            })
+            .then(response => response.json())
+            .then(trainData => {
+                // Process the response and display status
+                displayTrainStatus(trainData);
+            })
+            .catch(error => console.error('Error fetching data:', error));
+        }
+
+        function displayTrainStatus(data) {
+            const statusContainer = document.getElementById("statusContainer");
+            statusContainer.innerHTML = ""; // Clear previous status
+
+            const trainDetails = data.details;
+            const trainStatus = data.train;
+            const stations = data.stations;
+
+            // Display train details
+            const detailsHTML = `
+                <h2>Train Details:</h2>
+                <p><strong>Train ID:</strong> ${trainDetails.id}</p>
+                <p><strong>Train Number:</strong> ${trainDetails.number}</p>
+                <p><strong>Train Name:</strong> ${trainDetails.name}</p>
+                <p><strong>Source:</strong> ${trainDetails.source}</p>
+                <p><strong>Destination:</strong> ${trainDetails.destination}</p>
+                <p><strong>Type:</strong> ${trainDetails.type}</p>
+                <p><strong>Days:</strong> ${trainDetails.daysStr}</p>
+                <br>
+            `;
+            statusContainer.innerHTML += detailsHTML;
+
+            // Display train status
+            const statusHTML = `
+                <h2>Train Status:</h2>
+                <p><strong>Scheduled Date:</strong> ${trainStatus.trs_date}</p>
+                <p><strong>Departed:</strong> ${trainStatus.departed == "1" ? "Yes" : "No"}</p>
+                <p><strong>Last Updated:</strong> ${trainStatus.lastUpdated}</p>
+                <p><strong>Source Name:</strong> ${trainStatus.source_name}</p>
+                <p><strong>Source Code:</strong> ${trainStatus.source_code}</p>
+                <p><strong>Late (mins):</strong> ${trainStatus.lateMins}</p>
+                <br>
+            `;
+            statusContainer.innerHTML += statusHTML;
+
+            // Display station-wise details in a table
+            if (stations.length > 0) {
+                const tableHTML = `
+                    <h2>Station-wise Details:</h2>
+                    <table>
+                        <tr>
+                            <th>Station Name</th>
+                            <th>Arrival Time</th>
+                            <th>Departure Time</th>
+                            <th>Actual Arrival Time</th>
+                            <th>Actual Departure Time</th>
+                            <th>Day</th>
+                            <th>Distance</th>
+                            <th>Delay Arrival</th>
+                            <th>Delay Departure</th>
+                        </tr>
+                        ${stations.map(station => `
+                            <tr>
+                                <td>${station.source_name}</td>
+                                <td>${station.arrival_time}</td>
+                                <td>${station.departure_time}</td>
+                                <td>${station.actual_arrival_time}</td>
+                                <td>${station.actual_departure_time}</td>
+                                <td>${station.day}</td>
+                                <td>${station.distance}</td>
+                                <td>${station.delay_arrival}</td>
+                                <td>${station.delay_departure}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                    <br>
+                `;
+                statusContainer.innerHTML += tableHTML;
+            } else {
+                statusContainer.innerHTML += "<p>No station-wise details available.</p>";
+            }
+        }
+    </script>
+</body>
+</html>

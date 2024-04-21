@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNR Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-image:url("pnr.jpg") ;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        form {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        /* body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+} */
+
+#result {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 50px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-right: 500px;
+    margin-left: 500px;
+    background-color: #FBAB7E;
+background-image: linear-gradient(62deg, #FBAB7E 0%, #F7CE68 100%);
+
+}
+
+
+        h2 {
+            color: #0b0303;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #0a0303;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>PNR Information</h1>
+    <form id="pnrForm">
+        <label for="pnr" style="color: #0b0303;">Enter PNR Number:</label>
+        <input type="text" id="pnr" name="pnr" required>
+        <button type="submit">Fetch Information</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        // JavaScript code remains the same as before
+        document.getElementById("pnrForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            var pnr = formData.get("pnr");
+            fetchPNRInformation(pnr);
+        });
+
+        function fetchPNRInformation(pnr) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "https://pnr-status-indian-railway.p.rapidapi.com/pnr-check/" + pnr);
+            xhr.setRequestHeader("X-RapidAPI-Key", "0f8931de06mshd5ad5c9be16c35cp1d98bfjsnef6cd1d1e0c5");
+            xhr.setRequestHeader("X-RapidAPI-Host", "pnr-status-indian-railway.p.rapidapi.com");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var response_data = JSON.parse(xhr.responseText);
+                    displayPNRInformation(response_data);
+                }
+            };
+            xhr.send();
+        }
+
+        function displayPNRInformation(response_data) {
+            var resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = ""; // Clear previous results
+            var seat_info = response_data['data']['seatInfo'];
+            var train_info = response_data['data']['trainInfo'];
+            var boarding_info = response_data['data']['boardingInfo'];
+            var destination_info = response_data['data']['destinationInfo'];
+
+            resultDiv.innerHTML += "<h2>Seat Information:</h2>";
+            resultDiv.innerHTML += "<p>Coach: " + seat_info.coach + "</p>";
+            resultDiv.innerHTML += "<p>Berth: " + seat_info.berth + "</p>";
+            resultDiv.innerHTML += "<p>Number of Seats: " + seat_info.noOfSeats + "</p>";
+
+            resultDiv.innerHTML += "<h2>Train Information:</h2>";
+            resultDiv.innerHTML += "<p>Train Number: " + train_info.trainNo + "</p>";
+            resultDiv.innerHTML += "<p>Name: " + train_info.name + "</p>";
+
+            resultDiv.innerHTML += "<h2>Boarding Information:</h2>";
+            resultDiv.innerHTML += "<p>Station Code: " + boarding_info.stationCode + "</p>";
+            resultDiv.innerHTML += "<p>Station Name: " + boarding_info.stationName + "</p>";
+            resultDiv.innerHTML += "<p>Travelling Day: " + boarding_info.travellingDay + "</p>";
+            resultDiv.innerHTML += "<p>Platform: " + boarding_info.platform + "</p>";
+
+            resultDiv.innerHTML += "<h2>Destination Information:</h2>";
+            resultDiv.innerHTML += "<p>Station Code: " + destination_info.stationCode + "</p>";
+            resultDiv.innerHTML += "<p>Station Name: " + destination_info.stationName + "</p>";
+            resultDiv.innerHTML += "<p>Travelling Day: " + destination_info.travellingDay + "</p>";
+            resultDiv.innerHTML += "<p>Platform: " + destination_info.platform + "</p>";
+        }
+    </script>
+</body>
+</html>

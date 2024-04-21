@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Fare Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            background-color: #8EC5FC;
+background-image: linear-gradient(62deg, #8EC5FC 0%, #E0C3FC 100%);
+
+        }
+        .container {
+            background-color: #0093E9;
+background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .result h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .result p {
+            margin: 5px 0;
+            font-weight: bold;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Train Fare Information</h1>
+        <label for="trainNo">Train Number:</label>
+        <input type="text" id="trainNo" value="19038">
+        <label for="fromStationCode">From Station Code:</label>
+        <input type="text" id="fromStationCode" value="ST">
+        <label for="toStationCode">To Station Code:</label>
+        <input type="text" id="toStationCode" value="BVI">
+        <button onclick="fetchFare()">Get Fare</button>
+
+        <div class="result" id="fareResult">
+            <!-- Fare information will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        function fetchFare() {
+            const trainNo = document.getElementById("trainNo").value;
+            const fromStationCode = document.getElementById("fromStationCode").value;
+            const toStationCode = document.getElementById("toStationCode").value;
+
+            fetch(`https://irctc1.p.rapidapi.com/api/v2/getFare?trainNo=${trainNo}&fromStationCode=${fromStationCode}&toStationCode=${toStationCode}`, {
+                "method": "GET",
+                "headers": {
+                    "X-RapidAPI-Key": "be41407127mshaf072a89cdd90e0p14b99djsn99b6d899b63e",
+                    "X-RapidAPI-Host": "irctc1.p.rapidapi.com"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const fareResult = document.getElementById("fareResult");
+                fareResult.innerHTML = ''; // Clear previous data
+
+                if ("data" in data && "general" in data["data"]) {
+                    const generalFares = data["data"]["general"];
+                    const sortedFares = generalFares.sort((a, b) => a["classType"].localeCompare(b["classType"]));
+                    sortedFares.forEach(fare => {
+                        const classType = fare["classType"];
+                        const fareAmount = fare["fare"];
+
+                        const fareInfo = document.createElement("div");
+                        fareInfo.innerHTML = `
+                            <h2>Class Type: ${classType}</h2>
+                            <p>Fare: ${fareAmount}</p>
+                        `;
+                        fareResult.appendChild(fareInfo);
+                    });
+
+                    // Check if "SL" (Sleeper) class is present
+                    const slFare = generalFares.find(fare => fare.classType === "SL");
+                    if (!slFare) {
+                        const slInfo = document.createElement("div");
+                        slInfo.innerHTML = `
+                            <h2>Class Type: SL (Sleeper)</h2>
+                            <p>Fare: Not Available</p>
+                        `;
+                        fareResult.appendChild(slInfo);
+                    }
+                } else {
+                    fareResult.innerHTML = "<p>No fare information found.</p>";
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const fareResult = document.getElementById("fareResult");
+                fareResult.innerHTML = "<p>An error occurred. Please try again later.</p>";
+            });
+        }
+    </script>
+</body>
+</html>

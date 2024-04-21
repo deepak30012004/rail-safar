@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Train Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        label {
+            flex-basis: calc(33.33% - 10px);
+            margin-bottom: 10px;
+        }
+
+        input[type="text"],
+        input[type="submit"] {
+            width: calc(66.66% - 10px);
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #trainInfoContainer {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .train-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .train-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .train-number,
+        .train-type {
+            margin-top: 5px;
+            color: #666;
+        }
+
+        .time-info {
+            margin-top: 10px;
+        }
+
+        .arrival-departure {
+            margin-bottom: 5px;
+            color: #888;
+        }
+
+        .class-info {
+            margin-top: 10px;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Live Train Information</h1>
+    
+    <!-- Form for inputting parameters -->
+    <form id="trainForm">
+        <label for="fromStationCode">From Station Code:</label>
+        <input type="text" id="fromStationCode" name="fromStationCode">
+        <label for="toStationCode">To Station Code:</label>
+        <input type="text" id="toStationCode" name="toStationCode">
+        <label for="hours">Hours:</label>
+        <input type="text" id="hours" name="hours">
+        <input type="submit" value="Submit">
+    </form>
+
+    <!-- Train Information will be displayed here -->
+    <div id="trainInfoContainer">
+        Loading train information...
+    </div>
+</div>
+
+<script>
+    // JavaScript code as before
+
+    document.getElementById("trainForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+        var params = [];
+        formData.forEach(function(value, key) {
+            params.push(key + "=" + encodeURIComponent(value));
+        });
+        var queryString = params.join("&");
+        fetchTrainInformation(queryString);
+    });
+
+    function fetchTrainInformation(queryString) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "https://irctc1.p.rapidapi.com/api/v3/getLiveStation?" + queryString, true);
+        xhr.setRequestHeader("X-RapidAPI-Key", "254aacaae3msh7efff0ed3b899bap13187cjsne9e1968c4df6");
+        xhr.setRequestHeader("X-RapidAPI-Host", "irctc1.p.rapidapi.com");
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var trainsData = JSON.parse(xhr.responseText).data;
+                var trainInfoContainer = document.getElementById("trainInfoContainer");
+                trainInfoContainer.innerHTML = ""; // Clear previous results
+                trainsData.forEach(function (trainInfo) {
+                    var trainDiv = document.createElement("div");
+                    trainDiv.classList.add("train-info");
+                    trainDiv.innerHTML = "<div class='train-name'>" + trainInfo.trainName + "</div>" +
+                        "<div class='train-number'>Train Number: " + trainInfo.trainNumber + "</div>" +
+                        "<div class='train-type'>Train Type: " + trainInfo.trainType + "</div>" +
+                        "<div class='time-info'>" +
+                        "<div class='arrival-departure'>Arrival Time: " + trainInfo.arrivalTime + "</div>" +
+                        "<div class='arrival-departure'>Departure Time: " + trainInfo.departureTime + "</div>" +
+                        "</div>" +
+                        "<div class='class-info'>Classes: " + getClassInfo(trainInfo.classes) + "</div>";
+                    trainInfoContainer.appendChild(trainDiv);
+                });
+            }
+        };
+        xhr.send();
+    }
+
+    function getClassInfo(classes) {
+        var classNames = [];
+        classes.forEach(function (cls) {
+            classNames.push(cls.name);
+        });
+        return classNames.join(", ");
+    }
+</script>
+
+</body>
+</html>
+

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAIL SAFAR - REGISTER</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-image: url('van.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: right;
+        }
+
+        
+        header {
+    text-align: center;
+    background-color: #007bff;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+}
+
+header h1 {
+    text-align: center;
+    margin: 0;
+    margin-left: 5px;
+    /* margin-right:100px; */
+
+  
+    text-align: center;
+    margin: 0 auto; /* Center horizontally */
+    margin-right:600px;
+
+
+}
+
+
+        header img {
+            height: 70px; /* Adjust as needed */
+            margin-right: auto; /* Move the logo to the left */
+        }
+
+        main {
+            padding: 2rem;
+            display: flex;
+        }
+
+        section {
+            max-width: 30rem;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 1rem;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        input[type="password"],
+        input[type="date"] {
+            width: 100%;
+            padding: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        button[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            margin-top: 1rem;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        footer {
+            margin-bottom: 0px;;
+            margin-top: 150px;
+            background-color: #1e5f9f;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        /* Sidebar styles */
+        nav {
+            background-color: #2b4560;
+            color: white;
+            width: 200px;
+            padding: 1rem;
+            margin-right: 20px;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li {
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <body>
+        <header>
+            <img src="v3.jpg.png" alt="Logo"> <!-- Add your logo image here -->
+            <h1>RAIL SAFAR</h1>
+        </header>
+        <main>
+            <nav>
+                <ul>
+                    <li><a href="https://www.irctc.co.in/online-charts/">• CURRENT AVL TIMINGS/FIRST CHART STATUS</a></li>
+                    <li><a href="t2.html">• TRAIN B/W STATIONS</a></li>
+                    <li><a href="route.html">• TRAIN INFO</a></li>
+                    <li><a href="pnr.html">• PNR STATUS</a></li>
+                    <li><a href="seat_map.html">• SEAT MAP</a></li>
+                    <li><a href="fare.html">• FARE ENQUIRY</a></li>
+                    <!-- Add links to other pages as needed -->
+                </ul>
+            </nav>
+            <section>
+                <h2>SEARCH TRAIN</h2>
+                <form>
+                    <fieldset>
+                        <legend>Source Station</legend>
+                        <input type="text" id="source-station" name="source-station" placeholder="Enter Source Station">
+                    </fieldset>
+                    <fieldset>
+                        <legend>Destination Station</legend>
+                        <input type="text" id="destination-station" name="destination-station" placeholder="Enter Destination Station">
+                    </fieldset>
+                    <fieldset>
+                        <legend>Travel Date</legend>
+                        <input type="date" id="date" name="date" value="01/01/2023">
+                    </fieldset>
+                    <button type="submit">SEARCH</button>
+                </form>
+            </section>
+        </main>
+        <footer>
+            <p>© 2023 RAIL SAFAR</p>
+        </footer>
+    
+        <script>
+            // Add event listeners to navigation links
+            document.querySelectorAll('nav a').forEach(link => {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault(); // Prevent the default action
+                    const href = this.getAttribute('href'); // Get the href attribute
+                    window.location.href = href; // Navigate to the specified URL
+                });
+            });
+        </script>
+    </body>
+    </html>

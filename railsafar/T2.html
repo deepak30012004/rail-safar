@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            background-color: #8EC5FC;
+background-image: linear-gradient(62deg, #8EC5FC 0%, #E0C3FC 100%);
+
+        }
+        .container {
+            background-color: #0093E9;
+background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 100%);
+
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="date"], button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Train Information</h1>
+        <label for="fromStationCode">From Station Code:</label>
+        <input type="text" id="fromStationCode" value="BPL">
+        <label for="toStationCode">To Station Code:</label>
+        <input type="text" id="toStationCode" value="NDLS">
+        <label for="dateOfJourney">Date of Journey:</label>
+        <input type="date" id="dateOfJourney" value="2024-04-13">
+        <button onclick="fetchTrainData()">Fetch Train Data</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Train Name</th>
+                    <th>Train Number</th>
+                    <th>From Station</th>
+                    <th>To Station</th>
+                    <th>Departure Time</th>
+                    <th>Arrival Time</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody id="trainData">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function fetchTrainData() {
+            const fromStationCode = document.getElementById("fromStationCode").value;
+            const toStationCode = document.getElementById("toStationCode").value;
+            const dateOfJourney = document.getElementById("dateOfJourney").value;
+
+            fetch(`https://irctc1.p.rapidapi.com/api/v3/trainBetweenStations?fromStationCode=${fromStationCode}&toStationCode=${toStationCode}&dateOfJourney=${dateOfJourney}`, {
+                "method": "GET",
+                "headers": {
+                    "X-RapidAPI-Key": "254aacaae3msh7efff0ed3b899bap13187cjsne9e1968c4df6",
+                    "X-RapidAPI-Host": "irctc1.p.rapidapi.com"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const trainData = data.data;
+                const tableBody = document.getElementById("trainData");
+                tableBody.innerHTML = ''; // Clear previous data
+
+                trainData.forEach(train => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${train.train_name}</td>
+                        <td>${train.train_number}</td>
+                        <td>${train.from_station_name}</td>
+                        <td>${train.to_station_name}</td>
+                        <td>${train.from_std}</td>
+                        <td>${train.to_std}</td>
+                        <td>${train.duration}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(err => {
+                console.error(err);
+            });
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Train Information</h1>
+    <form id="trainForm">
+        <label for="trainNo">Enter Train Number:</label>
+        <input type="text" id="trainNo" name="trainNo">
+        <button type="submit">Get Train Information</button>
+    </form>
+    <table id="trainTable">
+        <tr>
+            <th>Train Name</th>
+            <td id="trainName">-</td>
+        </tr>
+        <tr>
+            <th>Current Station Code</th>
+            <td id="stationCode">-</td>
+        </tr>
+        <tr>
+            <th>Current Station Name</th>
+            <td id="stationName">-</td>
+        </tr>
+        <tr>
+            <th>Current Status</th>
+            <td id="currentStatus">-</td>
+        </tr>
+        <tr>
+            <th>Message</th>
+            <td id="message">-</td>
+        </tr>
+        <tr>
+            <th>Hint</th>
+            <td id="hint">-</td>
+        </tr>
+    </table>
+</div>
+
+<script>
+    document.getElementById('trainForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent form submission
+        
+        var trainNo = document.getElementById('trainNo').value;
+        
+        // Fetch train information from API
+        fetchTrainInformation(trainNo);
+    });
+
+    function fetchTrainInformation(trainNo) {
+        var url = "https://irctc1.p.rapidapi.com/api/v1/liveTrainStatus?trainNo=" + trainNo + "&startDay=1";
+        var headers = {
+            'X-RapidAPI-Key': "c0963bd6e4msh4cf8b246c9b4365p1b520cjsnc1c21d9e2839",
+            'X-RapidAPI-Host': "irctc1.p.rapidapi.com"
+        };
+
+        fetch(url, { headers: headers })
+            .then(response => response.json())
+            .then(data => {
+                // Update HTML with train information
+                document.getElementById('trainName').textContent = data.trainName;
+                document.getElementById('stationCode').textContent = data.currentStationCode;
+                document.getElementById('stationName').textContent = data.currentStationName;
+                document.getElementById('currentStatus').textContent = data.currentStatus;
+                document.getElementById('message').textContent = data.message;
+                document.getElementById('hint').textContent = data.hint;
+            })
+            .catch(error => {
+                console.error('Error fetching train information:', error);
+                // Display error message
+                document.getElementById('trainName').textContent = '-';
+                document.getElementById('stationCode').textContent = '-';
+                document.getElementById('stationName').textContent = '-';
+                document.getElementById('currentStatus').textContent = '-';
+                document.getElementById('message').textContent = 'Error fetching train information. Please try again.';
+                document.getElementById('hint').textContent = '-';
+            });
+    }
+</script>
+
+</body>
+</html>
